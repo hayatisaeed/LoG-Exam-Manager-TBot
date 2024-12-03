@@ -1,0 +1,27 @@
+<header>
+        <nav>
+            <a href="/dashboard">Dashboard</a> |
+            <a href="/manage_users">Manage Users</a> |
+            <a href="/manage_groups">Manage Groups</a> |
+            <a href="/assign_groups">Assign Groups</a> |
+            <a href="/logout">Logout</a>
+        </nav>
+    </header>
+
+<h2>Add User</h2>
+<form method="POST">
+    <label for="role">Role:</label>
+    <select name="role" required>
+        <option value="student">Student</option>
+        <option value="teacher">Teacher</option>
+        <option value="admin">Admin</option>
+    </select>
+    <br>
+    <label for="fullname">Name:</label>
+    <input type="text" name="fullname" required>
+    <br>
+    <label for="chat_id">Chat ID:</label>
+    <input type="number" name="chat_id">
+    <br>
+    <button type="submit">Add User</button>
+</form>

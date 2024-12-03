@@ -1,38 +1,43 @@
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime, Float, Table
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
+from sqlalchemy import Table, Column, Integer, ForeignKey
+from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
 # Association tables for many-to-many relationships
-group_students = Table(
-    'group_students', Base.metadata,
-    Column('group_id', Integer, ForeignKey('groups.id')),
-    Column('student_id', Integer, ForeignKey('users.id'))
+teacher_groups = Table(
+    'teacher_groups',
+    Base.metadata,
+    Column('user_id', Integer, ForeignKey('users.id')),
+    Column('group_id', Integer, ForeignKey('groups.id'))
 )
 
-group_teachers = Table(
-    'group_teachers', Base.metadata,
-    Column('group_id', Integer, ForeignKey('groups.id')),
-    Column('teacher_id', Integer, ForeignKey('users.id'))
+student_groups = Table(
+    'student_groups',
+    Base.metadata,
+    Column('user_id', Integer, ForeignKey('users.id')),
+    Column('group_id', Integer, ForeignKey('groups.id'))
 )
 
 
 class User(Base):
     __tablename__ = 'users'
-    id = Column(Integer, primary_key=True)  # Auto-incremented primary key
-    user_id = Column(String, unique=True, nullable=True)  # Unique user identifier
-    name = Column(String, nullable=False)
-    role = Column(String, nullable=False)  # 'student', 'teacher', 'admin'
-    profile_data = Column(String)
-
+    id = Column(Integer, primary_key=True)
+    chat_id = Column(String, unique=True, nullable=True)
+    fullname = Column(String, nullable=False)
+    role = Column(String, nullable=False)
+    profile_data = Column(String, nullable=True)
+    teaching_groups = relationship('Group', secondary=teacher_groups, back_populates='teachers')
+    student_groups = relationship('Group', secondary=student_groups, back_populates='students')
 
 
 class Group(Base):
     __tablename__ = 'groups'
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    students = relationship('User', secondary=group_students, backref='groups_as_student')
-    teachers = relationship('User', secondary=group_teachers, backref='groups_as_teacher')
+    teachers = relationship('User', secondary=teacher_groups, back_populates='teaching_groups')
+    students = relationship('User', secondary=student_groups, back_populates='student_groups')
 
 
 class Exam(Base):

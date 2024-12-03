@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Manage Users{% endblock %}
+{% block content %}
+<h1>Manage Users</h1>
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>ChatID</th>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.chat_id }}</td>
+            <td>{{ user.fullname }}</td>
+            <td>{{ user.role }}</td>
+            <td>
+                <a href="/edit_user/{{ user.id }}">Edit</a> |
+                <a href="/delete_user/{{ user.id }}">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="/add_user">Add New User</a>
+{% endblock %}

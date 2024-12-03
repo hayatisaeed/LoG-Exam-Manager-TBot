@@ -1,7 +1,7 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from contextlib import contextmanager
-from models import Base
+
 
 DATABASE_URL = "sqlite:///exam_bot.db"
 engine = create_engine(DATABASE_URL)

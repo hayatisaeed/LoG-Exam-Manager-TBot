@@ -1,0 +1,12 @@
+<h2>Assign Groups to {{ user.name }}</h2>
+<form method="POST">
+    <label for="groups">Select Groups:</label>
+    <select name="groups" multiple>
+        {% for group in groups %}
+            <option value="{{ group.id }}" {% if user.role == "teacher" and group in user.teaching_groups %}selected{% elif user.role == "student" and group in user.student_groups %}selected{% endif %}>
+                {{ group.name }}
+            </option>
+        {% endfor %}
+    </select>
+    <button type="submit">Save</button>
+</form>

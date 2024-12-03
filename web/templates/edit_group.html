@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Group</title>
+</head>
+<body>
+<header>
+        <nav>
+            <a href="/dashboard">Dashboard</a> |
+            <a href="/manage_users">Manage Users</a> |
+            <a href="/manage_groups">Manage Groups</a> |
+            <a href="/logout">Logout</a>
+        </nav>
+    </header>
+    <h1>Edit Group</h1>
+    <form action="/edit_group/{{ group.id }}" method="post">
+        <label for="group_name">Group Name:</label>
+        <input type="text" name="group_name" id="group_name" value="{{ group.name }}" required><br><br>
+
+        <h2>Group's Teachers</h2>
+        <p>Select teachers for this group (you can select multiple):</p>
+        <div>
+    {% for teacher in teachers %}
+        <label>
+            <input type="checkbox" name="teacher_ids" value="{{ teacher.id }}"
+                   {% if teacher in group.teachers %}checked{% endif %}>
+            {{ teacher.fullname }}
+        </label><br>
+    {% endfor %}
+</div><br><br>
+
+
+    <h2>Group's Students</h2>
+
+    <!-- Search box for dynamic search -->
+    <label for="search_students">Search Students:</label>
+    <input type="text" id="search_students" placeholder="Type a name..." oninput="searchStudents()" autocomplete="off">
+
+    <!-- Suggestions list for search results -->
+    <ul id="search_results" style="list-style-type: none; padding: 0;"></ul>
+
+    <!-- Selected students list -->
+    <h3>Selected Students:</h3>
+    <ul id="selected_students">
+        {% for student in group.students %}
+        <li id="student-{{ student.id }}">
+            {{ student.fullname }}
+            <button type="button" onclick="removeStudent({{ student.id }})">Remove</button>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Hidden input to store selected student IDs -->
+    <input type="hidden" name="student_ids" id="student_ids"
+           value="{% for student in group.students %}{{ student.id }}{% if not loop.last %},{% endif %}{% endfor %}">
+
+    <button type="submit">Save</button>
+</form>
+
+<script>
+    const selectedStudents = new Set(
+        "{% for student in group.students %}{{ student.id }}{% if not loop.last %},{% endif %}{% endfor %}".split(",").filter(Boolean)
+    );
+
+    // Fetch search results
+    async function searchStudents() {
+        const query = document.getElementById("search_students").value;
+        const resultsContainer = document.getElementById("search_results");
+        resultsContainer.innerHTML = ""; // Clear previous results
+
+        if (query.trim() === "") return;
+
+        const response = await fetch(`/search_students?query=${encodeURIComponent(query)}`);
+        const students = await response.json();
+
+        students.forEach(student => {
+            if (!selectedStudents.has(student.id.toString())) {
+                const li = document.createElement("li");
+                li.textContent = student.fullname + " - " + student.chat_id;
+                li.onclick = () => addStudent(student.id, student.fullname);
+                resultsContainer.appendChild(li);
+            }
+        });
+    }
+
+    // Add student to the selected list
+    function addStudent(id, fullname) {
+        if (selectedStudents.has(id.toString())) return;
+
+        selectedStudents.add(id.toString());
+
+        const selectedContainer = document.getElementById("selected_students");
+        const li = document.createElement("li");
+        li.id = `student-${id}`;
+        li.innerHTML = `${fullname} <button type="button" onclick="removeStudent(${id})">Remove</button>`;
+        selectedContainer.appendChild(li);
+
+        updateHiddenInput();
+    }
+
+    // Remove student from the selected list
+    function removeStudent(id) {
+        selectedStudents.delete(id.toString());
+
+        const li = document.getElementById(`student-${id}`);
+        if (li) li.remove();
+
+        updateHiddenInput();
+    }
+
+    // Update the hidden input with selected IDs
+    function updateHiddenInput() {
+        document.getElementById("student_ids").value = Array.from(selectedStudents).join(",");
+    }
+</script>
+
+</body>
+</html>

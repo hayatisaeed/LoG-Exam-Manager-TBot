@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Manage Groups{% endblock %}
+{% block content %}
+<h1>Manage Groups</h1>
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for group in groups %}
+        <tr>
+            <td>{{ group.id }}</td>
+            <td>{{ group.name }}</td>
+            <td>
+                <a href="/edit_group/{{ group.id }}">Edit</a> |
+                <a href="/delete_group/{{ group.id }}">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="/add_group">Add New Group</a>
+{% endblock %}
